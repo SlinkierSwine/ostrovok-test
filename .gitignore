@@ -208,3 +208,6 @@ __marimo__/
 
 # lsp
 .null-ls_*
+
+# docker compose
+docker-compose.override.yml
