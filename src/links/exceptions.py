@@ -1,4 +1,4 @@
-class ApplicationError(Exception)
+class ApplicationError(Exception):
     pass
 
 
