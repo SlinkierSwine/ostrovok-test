@@ -69,3 +69,12 @@ def test_not_found(f_client: TestClient) -> None:
     res = f_client.get("/unknown")
     assert res.status_code == 404
 
+
+@pytest.mark.usefixtures('m_generate_short_id')
+def test_shorten_integrety_error(f_client: TestClient) -> None:
+    res = f_client.post("/shorten", json={"url": "https://example.com"})
+    assert res.status_code == 200
+
+    res = f_client.post("/shorten", json={"url": "https://example.com"})
+    assert res.status_code == 400
+    assert res.json()['detail'] == 'Failed to generate unique short_id, try again later'

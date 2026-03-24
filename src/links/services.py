@@ -32,9 +32,8 @@ class LinkService:
         return link.original_url
 
     def shorten(self, url: str) -> str:
-        short_id = generate_short_id()
-
         for _ in range(self.MAX_INTEGRITY_ERROR_RETRIES):
+            short_id = generate_short_id()
             try:
                 link = self._repo.create(url, short_id)
                 return link.short_url
