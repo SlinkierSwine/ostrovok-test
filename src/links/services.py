@@ -16,12 +16,20 @@ logger = logging.getLogger(__name__)
 class LinkService:
     MAX_INTEGRITY_ERROR_RETRIES = 5
 
-
     def __init__(self, repo: LinkRepository) -> None:
         self._repo = repo
 
     def get_link(self, short_id: str) -> Link | None:
         return self._repo.get(short_id)
+
+    def get_original_url(self, short_id: str) -> str | None:
+        link = self._repo.get(short_id)
+
+        if not link:
+            return
+
+        self._repo.increment_clicks(link)
+        return link.original_url
 
     def shorten(self, url: str) -> Link:
         short_id = generate_short_id()
@@ -39,9 +47,6 @@ class LinkService:
         raise LinkIntegrityError(
             'Failed to generate unique short_id, try again later'
         )
-
-    def increment_clicks(self, link: Link) -> None:
-        self._repo.increment_clicks(link)
 
 
 def get_link_service(db: Session = Depends(get_db)) -> LinkService:

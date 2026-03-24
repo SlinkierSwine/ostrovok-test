@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import HttpUrl
 
-from links.schemas import LinkResponse, ShortIdResponse
+from links.schemas import LinkCreate, LinkResponse, ShortIdResponse
 from links.services import LinkService, get_link_service
 from links.exceptions import LinkIntegrityError
 
@@ -31,13 +31,13 @@ def stats(
     )
 
 
-@router.get("/shorten")
+@router.post("/shorten")
 def shorten(
-    url: HttpUrl,
+    data: LinkCreate,
     link_service: LinkService = Depends(get_link_service)
 ) -> ShortIdResponse:
     try:
-        link = link_service.shorten(str(url))
+        link = link_service.shorten(str(data.url))
     except LinkIntegrityError as e:
         raise HTTPException(400, str(e))
 
@@ -49,11 +49,9 @@ def redirect(
     short_id: str,
     link_service: LinkService = Depends(get_link_service)
 ) -> RedirectResponse:
-    link = link_service.get_link(short_id)
-    if not link:
+    url = link_service.get_original_url(short_id)
+    if not url:
         raise HTTPException(404, "Not found")
 
-    link_service.increment_clicks(link)
-
-    return RedirectResponse(link.original_url)
+    return RedirectResponse(url)
 

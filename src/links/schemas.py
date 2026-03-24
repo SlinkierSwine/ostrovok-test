@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 
 class LinkResponse(BaseModel):
@@ -10,3 +10,6 @@ class LinkResponse(BaseModel):
 class ShortIdResponse(BaseModel):
     short_id: str
 
+
+class LinkCreate(BaseModel):
+    url: HttpUrl
